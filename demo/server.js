@@ -1,44 +1,95 @@
 'use strict';
+require("dotenv").config();
 const express = require("express");
-const movieData = require('../demo/Movie Data/data.json')
-const app = express();
-const port = 3000;
 const cors = require('cors');
+const axios = require("axios");
+const app = express();
+const movieKey = process.env.API_KEY;
+const port = process.env.PORT;
+const movieData = require('../demo/MovieData/data.json')
 app.use(cors());
 
-let result=[];
-function Movie(title, poster_path, overview) {
+function Movie(id, title, release_date, poster_path, overview) {
+    this.id = id;
     this.title = title;
+    this.release_date = release_date;
     this.poster_path = poster_path;
     this.overview = overview;
-    result.push(this);
 }
-app.get('/', (req, res) => {
-    new Movie(movieData.title,movieData.poster_path,movieData.overview);
-    res.send(result);
-});
+app.get("/", handleMoviesFromJSON);
+app.get("/favorite", handleFavorite);
+app.get("/trending", handleMovies);
+app.get("/search", handleMoviesSearch);
+app.get("/genre", handleMoviesGenre);
+app.get('/discover', handleMoviesDiscover);
 
 
-//app.get("*", (req, res) => {
-//  res.status(404).send('page not found');
-//});
-app.get("/favorite", (req, res) => {
 
+
+
+function handleMoviesFromJSON(req, res) {
+    let moviesJSON = movieData.data.map((el) => {
+        return new Movie(el.title, el.poster_path, el.overview)
+    })
+    res.send(moviesJSON);
+};
+
+
+function handleFavorite(req, res) {
     res.send('Welcome to Favorite Page')
+};
 
-})
+async function handleMovies(req, res) {
+    const url = `https://api.themoviedb.org/3/trending/all/week?api_key=${movieKey}&/discover/movie/?certification_country=US&certification=R&sort_by=vote_average.desc`
+    let moviesFromAPI = await axios.get(url);
+    let movies = moviesFromAPI.data.results.map((item) => {
+        return new Movie(item.id, item.title, item.release_date, item.poster_path, item.overview)
+    })
+    res.send(movies);
+};
+
+async function handleMoviesSearch(req, res) {
+    const searchWord = req.query.movieName;
+    const url = `https://api.themoviedb.org/3/search/movie?api_key=${movieKey}&language=en-US&query=${searchWord}&page=1&include_adult=false`;
+    let result = await axios.get(url);
+    let movies = result.data.results.map((item) => {
+        return new Movie(item.id, item.title, item.release_date, item.poster_path, item.overview)
+    })
+    res.send(movies);
+}
+
+async function handleMoviesGenre(req, res) {
+    const url = `https://api.themoviedb.org/3/genre/movie/list?api_key=${movieKey}`
+    let movieFromAPI = await axios.get(url);
+  const genres = movieFromAPI.data.genres;
+  res.send(genres);
+    
+};
+
+async function handleMoviesDiscover (req,res) {
+
+    const url = `https://api.themoviedb.org/3/discover/movie?api_key=${movieKey}`;
+
+    let result = await axios.get(url);
+    let movies = result.data.results.map((item) => {
+        return new Movie(item.id, item.title, item.release_date, item.poster_path, item.overview)
+    })
+    res.send(movies);
+    
+}
+
 
 app.use(notFoundHandler);
 function notFoundHandler(req, res) {
     res.status(404).send('page not found error');
 
 }
-app.use((req,res)=>{
+app.use((req, res) => {
     res.status(500).json({
-      status: 500,
-      responseText: 'Sorry, something went wrong'
+        status: 500,
+        responseText: 'Sorry, something went wrong'
     });
-  })
+})
 app.listen(port, () => {
 
     console.log(`server is listing of port ${port} `);
