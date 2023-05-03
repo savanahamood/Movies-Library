@@ -29,7 +29,7 @@ app.get('/discover', handleMoviesDiscover);
 
 function handleMoviesFromJSON(req, res) {
     let moviesJSON = movieData.data.map((el) => {
-        return new Movie(el.title, el.poster_path, el.overview)
+        return new Movie(el.id, el.title, el.release_date, el.poster_path, el.overview)
     })
     res.send(moviesJSON);
 };
@@ -74,6 +74,7 @@ async function handleMoviesDiscover (req,res) {
     let movies = result.data.results.map((item) => {
         return new Movie(item.id, item.title, item.release_date, item.poster_path, item.overview)
     })
+   // res.json({name:newmovie.name, image :newmovie.image})
     res.send(movies);
     
 }
