@@ -7,6 +7,7 @@
 <img src="demo/wrrc.ho.png"/>
 <img src="demo/wrrc.fav.png"/>
 <img src="demo/wrrcapi.png"/>
+<img src="demo/wrrcdatabase.png"/>
 
 
 ## Overview
@@ -21,3 +22,6 @@ After cloning the repo in the local machine run this command npm i to install al
 ## Project Features
 <!-- What are the features included in you app -->
 To get Home page that contains data about the movie and to get favourit page . 
+How to install all packages that needs to start building the server .
+Get the idea abour wrrc and how the server deal with the reqests .
+after this task i had a full imagination web request response cycle and i can make queries to get and insert in the data base

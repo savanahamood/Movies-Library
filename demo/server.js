@@ -7,7 +7,10 @@ const app = express();
 const movieKey = process.env.API_KEY;
 const port = process.env.PORT;
 const movieData = require('../demo/MovieData/data.json')
+const pg=require("pg");
+const client = new pg.Client(process.env.DATABASE_URL);
 app.use(cors());
+app.use(express.json());
 
 function Movie(id, title, release_date, poster_path, overview) {
     this.id = id;
@@ -22,10 +25,30 @@ app.get("/trending", handleMovies);
 app.get("/search", handleMoviesSearch);
 app.get("/genre", handleMoviesGenre);
 app.get('/discover', handleMoviesDiscover);
+app.get('/getMovies',handleGetMovies);
+app.post('/addMovie',handleAddMovies);
 
 
+function handleAddMovies(req,res){
+    const movie=req.body;
+    console.log(movie);
+   const sql=`INSERT into favmovie(id,title,release_date,poster_path,overview) values('${movie.id}','${movie.title}','${movie.release_date}','${movie.poster_path}','${movie.overview}')`
+client.query(sql).then(()=>{
+    res.send('added');
+})
+}
 
-
+function handleGetMovies(req,res){
+const sql='select * from favmovie;';
+client.query(sql).then((data)=>{
+    //res.send(data.rows);
+    let dataFromDB=data.rows.map((item)=>{
+        let singlemovie=new Movie(item.id,item.title,item.release_date, item.poster_path, item.overview)
+        return singlemovie;
+    });
+    res.send(dataFromDB);
+})
+}
 
 function handleMoviesFromJSON(req, res) {
     let moviesJSON = movieData.data.map((el) => {
@@ -91,7 +114,8 @@ app.use((req, res) => {
         responseText: 'Sorry, something went wrong'
     });
 })
-app.listen(port, () => {
-
-    console.log(`server is listing of port ${port} `);
+client.connect().then(()=>{
+    app.listen(port, () => {
+        console.log(`server is listing of port ${port} `);
+    })
 })
