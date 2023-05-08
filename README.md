@@ -8,6 +8,8 @@
 <img src="demo/wrrc.fav.png"/>
 <img src="demo/wrrcapi.png"/>
 <img src="demo/wrrcdatabase.png"/>
+<img src="demo/wrrcdatabaseDeleteandUpdate.png"/>
+
 
 
 ## Overview
