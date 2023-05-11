@@ -68,11 +68,15 @@ function handleDeleteMovies(req, res) {
 } 
 function handleAddMovies(req, res) {
     const movie = req.body;
-    //console.log(movie);
+    console.log(movie);
     const sql = `INSERT into favmovie(id,title,release_date,poster_path,overview) values('${movie.id}','${movie.title}','${movie.release_date}','${movie.poster_path}','${movie.overview}');`;
-    client.query(sql).then(() => {
+    client.query(sql).then((data) => {
         res.send('added');
-    })
+    }) .catch((error) => {
+console.log(error);
+    });
+    
+    
 }
 
 function handleGetMovies(req, res) {
