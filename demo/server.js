@@ -11,12 +11,13 @@ app.use(express.json());
 const movieKey = process.env.API_KEY;
 const port = process.env.PORT;
 const movieData = require('../demo/MovieData/data.json')
+//const image=`https://image.tmdb.org/t/p/original${poster_path}`
 
 function Movie(id, title, release_date, poster_path, overview) {
     this.id = id;
     this.title = title;
     this.release_date = release_date;
-    this.poster_path = poster_path;
+    this.poster_path = `https://image.tmdb.org/t/p/original${poster_path}`;
     this.overview = overview;
 }
 app.get("/", handleMoviesFromJSON);
